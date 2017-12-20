@@ -4,16 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-)
 
-type action int
+	"github.com/posya/md-org/action"
+)
 
 var trace, info *log.Logger
-
-const (
-	list action = iota
-	check
-)
 
 func init() {
 	trace = log.New(os.Stdout, "Trace: ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -24,11 +19,11 @@ func main() {
 	fmt.Println("Hello, World!")
 }
 
-func do(act action) error {
+func do(act action.Action) error {
 	switch act {
-	case list:
+	case action.List:
 		trace.Println("This is list action")
-	case check:
+	case action.Check:
 		trace.Println("This in check action")
 
 	}

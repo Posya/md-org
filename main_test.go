@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/posya/md-org/action"
+	"action"
 )
 
 func TestMain(t *testing.T) {

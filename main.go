@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/posya/md-org/action"
+	"action"
 )
 
 var trace, info *log.Logger

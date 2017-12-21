@@ -23,3 +23,7 @@ func TestDoCheck(t *testing.T) {
 		t.Error("Error occurs: ", err)
 	}
 }
+
+func TestParse(t *testing.T) {
+	parse("test.md-org")
+}

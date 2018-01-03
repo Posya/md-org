@@ -45,6 +45,8 @@ func TestParseWrongHeader(t *testing.T) {
 
 	headers := []string{
 		"# Bad tags #asdf this is error",
+		"# Date in tags #asdf @24.05.20018",
+		"# Date in tags @24.05.20018",
 	}
 
 	for _, in := range headers {
@@ -53,6 +55,7 @@ func TestParseWrongHeader(t *testing.T) {
 		assert.Nil(t, h)
 	}
 }
+
 func TestParseNotAHeader(t *testing.T) {
 
 	headers := []string{

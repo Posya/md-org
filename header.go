@@ -17,7 +17,7 @@ type header struct {
 var parseRegex, tagsRegex *regexp.Regexp
 
 func init() {
-	parseRegex = regexp.MustCompile(`^\s*(#+)\s+(\w.+?)(\B#\w.*)?$`)
+	parseRegex = regexp.MustCompile(`^\s*(#+)\s+(\w.+?)(\B[#@]\w.*)?$`)
 	tagsRegex = regexp.MustCompile(`^#\w+$`)
 }
 

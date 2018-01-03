@@ -4,7 +4,6 @@ import (
 	"action"
 	"bufio"
 	"fmt"
-	"logit"
 	"os"
 	"regexp"
 )
@@ -21,9 +20,9 @@ func main() {
 func do(act action.Action) error {
 	switch act {
 	case action.List:
-		logit.Trace("This is list action")
+		// logit.Trace("This is list action")
 	case action.Check:
-		logit.Trace("This in check action")
+		// logit.Trace("This in check action")
 
 	}
 

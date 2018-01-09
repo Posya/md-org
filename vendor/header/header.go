@@ -1,4 +1,4 @@
-package main
+package header
 
 import (
 	"errors"
@@ -14,17 +14,17 @@ type header struct {
 	tags       []string
 }
 
-var parseRegex, tagsRegex *regexp.Regexp
+var parseHeaderRegex, tagsRegex *regexp.Regexp
 
 func init() {
-	parseRegex = regexp.MustCompile(`^\s*(#+)\s+(\w.+?)(\B[#@]\w.*)?$`)
+	parseHeaderRegex = regexp.MustCompile(`^\s*(#+)\s+(\w.+?)(\B[#@]\w.*)?$`)
 	tagsRegex = regexp.MustCompile(`^#\w+$`)
 }
 
 func parseHeader(s string) (*header, error) {
 	var h header
 
-	m := parseRegex.FindStringSubmatch(s)
+	m := parseHeaderRegex.FindStringSubmatch(s)
 
 	if m == nil {
 		return nil, nil

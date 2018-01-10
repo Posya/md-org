@@ -45,32 +45,6 @@ func TestParseNotATask(t *testing.T) {
 	}
 }
 
-func TestCombineResults(t *testing.T) {
-	ins := [][6]string{
-		{"", "10.01.2018", "15:00", "", "", ""},
-		{"", "10.01.2018", "15:00", "17.01.2018", "", ""},
-		{"", "10.01.2018", "15:00", "17.01.2018", "17:00", ""},
-		{"", "10.01.2018", "15:00", "17.01.2018", "17:00", "+1w"},
-		{"", "10.01.2018", "15:00", "", "", "+1w"},
-	}
-
-	exp := []string{
-		"@10.01.2018_15:00",
-		"@10.01.2018_15:00-17.01.2018",
-		"@10.01.2018_15:00-17.01.2018_17:00",
-		"@10.01.2018_15:00-17.01.2018_17:00+1w",
-		"@10.01.2018_15:00+1w",
-	}
-
-	if len(ins) != len(exp) {
-		t.Fatal("Error in unit test: ins and exp has different length!")
-	}
-
-	for i := range exp {
-		assert.Equal(t, exp[i], combineResults(ins[i]))
-	}
-}
-
 func TestParseDate(t *testing.T) {
 	ins := [][]string{
 		{"@10.01.2018_15:00+1w"},
@@ -93,7 +67,7 @@ func TestParseDate(t *testing.T) {
 	}
 
 	for i := range exp {
-		assert.Equal(t, exp[i], parseDate(ins[i]))
+		assert.Equal(t, exp[i], parseDates(ins[i]))
 	}
 
 }

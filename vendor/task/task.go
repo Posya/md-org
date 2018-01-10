@@ -21,7 +21,7 @@ var parseTaskRegex, tagsAndDatesRegex, dateRegex *regexp.Regexp
 func init() {
 	parseTaskRegex = regexp.MustCompile(`^(\s*)- \[([\w ]?)\]\s+(\w.+?)(\B[#@]\w.*)?$`)
 	tagsAndDatesRegex = regexp.MustCompile(`^([@#])[\w\.:+-]+$`)
-	dateRegex = regexp.MustCompile(`^@(\d{1,2}\.\d{2}(?:\.\d{2,4})?)(?:_(\d{1,2}:\d{2}))?(?:-(\d{1,2}\.\d{2}(?:\.\d{2,4})?)(?:_(\d{1,2}:\d{2}))?)?(\+\d+[hdwmy])?$`)
+	dateRegex = regexp.MustCompile(`^@(\d{1,2}\.\d{2}(?:\.\d{4})?)(?:_(\d{1,2}:\d{2}))?(?:-(\d{1,2}\.\d{2}(?:\.\d{4})?)(?:_(\d{1,2}:\d{2}))?)?(?:\+(\d+)([hdwmy]))?$`)
 
 }
 
@@ -64,12 +64,12 @@ func parseTask(s string) (*task, error) {
 
 	}
 
-	t.date = parseDate(dates)
+	t.date = parseDates(dates)
 
 	return &t, nil
 }
 
-func parseDate(dates []string) string {
+func parseDates(dates []string) string {
 	var result [6]string
 
 	for _, d := range dates {
@@ -93,25 +93,7 @@ func parseDate(dates []string) string {
 		}
 	}
 
-	result[0] = combineResults(result)
+	//result[0] = combineResults(result)
 
 	return result[0]
-}
-
-func combineResults(in [6]string) string {
-	res := "@"
-	res += in[1]
-	if in[2] != "" {
-		res += "_" + in[2]
-	}
-	if in[3] != "" {
-		res += "-" + in[3]
-	}
-	if in[4] != "" {
-		res += "_" + in[4]
-	}
-	if in[5] != "" {
-		res += in[5]
-	}
-	return res
 }

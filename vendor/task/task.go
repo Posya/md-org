@@ -93,7 +93,7 @@ func parseDates(dates []string) string {
 		}
 	}
 
-	//result[0] = combineResults(result)
+	//result[0] = date.combineResults(result)
 
 	return result[0]
 }

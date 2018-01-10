@@ -6,23 +6,26 @@ import (
 	"time"
 )
 
-type date struct {
-	original string
-	from     time.Time
-	to       *time.Time
-	rep      *repetition
+// Date is struct to hold range of dates with possibility of repetition
+type Date struct {
+	Original string
+	From     time.Time
+	To       *time.Time
+	Rep      *Repetition
 }
 
-type repetition struct {
-	original string
-	value    int
-	interval unit
+// Repetition is struct to hold value and units of date repetition
+type Repetition struct {
+	Original string
+	Value    int
+	Interval Unit
 }
 
-type unit int
+// Unit is enum type for units of date repetition
+type Unit int
 
 const (
-	h unit = iota
+	h Unit = iota
 	d
 	w
 	m
@@ -31,10 +34,10 @@ const (
 
 var location = time.Now().Location()
 
-func parseRepetition(val, interval string) (*repetition, error) {
-	var res repetition
+func parseRepetition(val, interval string) (*Repetition, error) {
+	var res Repetition
 
-	res.original = "+" + val + interval
+	res.Original = "+" + val + interval
 
 	i, err := strconv.Atoi(val)
 	if err != nil {
@@ -43,19 +46,19 @@ func parseRepetition(val, interval string) (*repetition, error) {
 	if i <= 0 {
 		return nil, errors.New("parseRepetition: value can`t be negative: " + val)
 	}
-	res.value = i
+	res.Value = i
 
 	switch interval {
 	case "h":
-		res.interval = h
+		res.Interval = h
 	case "d":
-		res.interval = d
+		res.Interval = d
 	case "w":
-		res.interval = w
+		res.Interval = w
 	case "m":
-		res.interval = m
+		res.Interval = m
 	case "y":
-		res.interval = y
+		res.Interval = y
 	default:
 		return nil, errors.New("parseRepetition: unknown interval: " + interval)
 	}
@@ -63,32 +66,34 @@ func parseRepetition(val, interval string) (*repetition, error) {
 	return &res, nil
 }
 
-func (r repetition) equal(r1 repetition) bool {
-	if r.original != r1.original ||
-		r.value != r1.value ||
-		r.interval != r1.interval {
+// Equal compares two Repetition
+func (r Repetition) Equal(r1 Repetition) bool {
+	if r.Original != r1.Original ||
+		r.Value != r1.Value ||
+		r.Interval != r1.Interval {
 		return false
 	}
 	return true
 }
 
-func parse(dateFrom, timeFrom, dateTo, timeTo, repeatVal, repeatUnit string) (*date, error) {
-	var d date
+// Parse parses strings to return new Date
+func Parse(dateFrom, timeFrom, dateTo, timeTo, repeatVal, repeatUnit string) (*Date, error) {
+	var d Date
 	var err error
-	d.original = combineResults(dateFrom, timeFrom, dateTo, timeTo, repeatVal, repeatUnit)
+	d.Original = combineResults(dateFrom, timeFrom, dateTo, timeTo, repeatVal, repeatUnit)
 
 	from, err := parseOneDateTime(dateFrom, timeFrom)
 	if err != nil {
 		return nil, err
 	}
-	d.from = *from
+	d.From = *from
 
 	if dateTo != "" {
 		to, err := parseOneDateTime(dateTo, timeTo)
 		if err != nil {
 			return nil, err
 		}
-		d.to = to
+		d.To = to
 	}
 
 	if repeatVal != "" && repeatUnit != "" {
@@ -96,7 +101,7 @@ func parse(dateFrom, timeFrom, dateTo, timeTo, repeatVal, repeatUnit string) (*d
 		if err != nil {
 			return nil, err
 		}
-		d.rep = rep
+		d.Rep = rep
 	}
 	return &d, nil
 }
@@ -133,54 +138,56 @@ func combineResults(dateFrom, timeFrom, dateTo, timeTo, repeatVal, repeatUnit st
 	return res
 }
 
-func newDate(from time.Time, to, rep interface{}) date {
-	var d date
+// NewDate is constructor for Date struct
+func NewDate(from time.Time, to, rep interface{}) Date {
+	var d Date
 
-	d.from = from
+	d.From = from
 
 	switch v := to.(type) {
 	case time.Time:
-		d.to = &v
+		d.To = &v
 	default:
-		d.to = nil
+		d.To = nil
 	}
 
 	switch v := rep.(type) {
-	case repetition:
-		d.rep = &v
+	case Repetition:
+		d.Rep = &v
 	default:
-		d.rep = nil
+		d.Rep = nil
 	}
 
-	d.original = d.print()
+	d.Original = d.Print()
 
 	return d
 }
 
-func (d date) equal(d1 date) bool {
-	if d.original != d1.original {
+// Equal compares two Dates
+func (d Date) Equal(d1 Date) bool {
+	if d.Original != d1.Original {
 		return false
 	}
-	if !d.from.Equal(d1.from) {
+	if !d.From.Equal(d1.From) {
 		return false
 	}
 
-	if d.to == nil || d1.to == nil {
-		if d.to != d1.to {
+	if d.To == nil || d1.To == nil {
+		if d.To != d1.To {
 			return false
 		}
 	} else {
-		if !d.to.Equal(*d1.to) {
+		if !d.To.Equal(*d1.To) {
 			return false
 		}
 	}
 
-	if d.rep == nil || d1.rep == nil {
-		if d.rep != d1.rep {
+	if d.Rep == nil || d1.Rep == nil {
+		if d.Rep != d1.Rep {
 			return false
 		}
 	} else {
-		if !d.rep.equal(*d1.rep) {
+		if !d.Rep.Equal(*d1.Rep) {
 			return false
 		}
 	}
@@ -188,25 +195,26 @@ func (d date) equal(d1 date) bool {
 	return true
 }
 
-func (d date) print() string {
+// Print returns string representation of Date
+func (d Date) Print() string {
 	var from, to, rep string
 
-	if d.from.Hour() == 0 && d.from.Minute() == 0 {
-		from = d.from.Format("2.01.2006")
+	if d.From.Hour() == 0 && d.From.Minute() == 0 {
+		from = d.From.Format("2.01.2006")
 	} else {
-		from = d.from.Format("2.01.2006_15:04")
+		from = d.From.Format("2.01.2006_15:04")
 	}
 
-	if d.to != nil {
-		if d.to.Hour() == 0 && d.to.Minute() == 0 {
-			to = d.to.Format("-2.01.2006")
+	if d.To != nil {
+		if d.To.Hour() == 0 && d.To.Minute() == 0 {
+			to = d.To.Format("-2.01.2006")
 		} else {
-			to = d.to.Format("-2.01.2006_15:04")
+			to = d.To.Format("-2.01.2006_15:04")
 		}
 	}
 
-	if d.rep != nil {
-		rep = d.rep.original
+	if d.Rep != nil {
+		rep = d.Rep.Original
 	}
 
 	res := "@" + from + to + rep

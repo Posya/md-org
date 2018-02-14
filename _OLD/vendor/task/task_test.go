@@ -1,6 +1,7 @@
 package task
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,10 +13,10 @@ func TestParseTask(t *testing.T) {
 	h, err := parseTask(in)
 	assert.Nil(t, err)
 	if assert.NotNil(t, h) {
-		assert.Equal(t, in, h.original)
-		assert.Equal(t, 0, h.level)
-		assert.Equal(t, "Task 1", h.text)
-		assert.Equal(t, 0, len(h.tags))
+		assert.Equal(t, in, h.Original)
+		assert.Equal(t, 0, h.Level)
+		assert.Equal(t, "Task 1", h.Text)
+		assert.Equal(t, 0, len(h.Tags))
 	}
 
 }
@@ -67,7 +68,9 @@ func TestParseDate(t *testing.T) {
 	}
 
 	for i := range exp {
-		assert.Equal(t, exp[i], parseDates(ins[i]))
+		d, err := parseDates(ins[i])
+		assert.NoError(t, err, "error in "+strings.Join(ins[i], ", "))
+		assert.Equal(t, exp[i], *d)
 	}
 
 }

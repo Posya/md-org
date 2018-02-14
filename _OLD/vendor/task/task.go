@@ -1,19 +1,21 @@
 package task
 
 import (
+	"date"
 	"errors"
 	"regexp"
 	"strings"
 )
 
-type task struct {
-	original   string
-	lineNumber int
-	level      int
-	text       string
-	done       bool
-	tags       []string
-	date       string
+// Task is struct for task data keeping
+type Task struct {
+	Original   string
+	LineNumber int
+	Level      int
+	Text       string
+	Done       bool
+	Tags       []string
+	Date       date.Date
 }
 
 var parseTaskRegex, tagsAndDatesRegex, dateRegex *regexp.Regexp
@@ -25,8 +27,8 @@ func init() {
 
 }
 
-func parseTask(s string) (*task, error) {
-	var t task
+func parseTask(s string) (*Task, error) {
+	var t Task
 
 	m := parseTaskRegex.FindStringSubmatch(s)
 
@@ -34,25 +36,25 @@ func parseTask(s string) (*task, error) {
 		return nil, nil
 	}
 
-	t.original = s
-	t.level = len(m[1])
+	t.Original = s
+	t.Level = len(m[1])
 	switch m[2] {
 	case " ":
-		t.done = false
+		t.Done = false
 	case "X", "x":
-		t.done = true
+		t.Done = true
 	default:
 		return nil, errors.New("parseTask: wrong done state '" + m[2] + "'")
 	}
 
-	t.text = m[3]
+	t.Text = m[3]
 	tagsAndDates := strings.Fields(m[4])
 	var dates []string
 	for _, s := range tagsAndDates {
 		if m := tagsAndDatesRegex.FindStringSubmatch(s); m != nil {
 			switch m[1] {
 			case "#":
-				t.tags = append(t.tags, s)
+				t.Tags = append(t.Tags, s)
 			case "@":
 				dates = append(dates, s)
 			default:
@@ -64,29 +66,33 @@ func parseTask(s string) (*task, error) {
 
 	}
 
-	t.date = parseDates(dates)
+	d, err := parseDates(dates)
+	if err != nil {
+		return nil, err
+	}
+	t.Date = *d
 
 	return &t, nil
 }
 
-func parseDates(dates []string) string {
-	var result [6]string
+func parseDates(dates []string) (*date.Date, error) {
+	var result [7]string
 
 	for _, d := range dates {
 
 		m := dateRegex.FindStringSubmatch(d)
 
 		if m == nil {
-			return ""
+			return nil, errors.New("parseDates: this is not date: " + d)
 		}
 
-		for i := 1; i < 6; i++ {
+		for i := 1; i < 7; i++ {
 			if m[i] == "" {
 				continue
 			}
 
 			if result[i] != "" {
-				return ""
+				return nil, errors.New("parseDates: error: " + m[i] + " in date: " + d)
 			}
 
 			result[i] = m[i]
@@ -95,5 +101,5 @@ func parseDates(dates []string) string {
 
 	//result[0] = date.combineResults(result)
 
-	return result[0]
+	return nil, nil
 }

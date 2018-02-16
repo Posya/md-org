@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -29,7 +29,7 @@ func TestParse(t *testing.T) {
 
 	exp := [][]task{
 		[]task{
-			task{3, "- [ ] First task", "First task", []string{}, time.Time{}},
+			task{3, "- [ ] First task", "First task", []string{}, ""},
 		},
 	}
 
@@ -43,4 +43,73 @@ func TestParse(t *testing.T) {
 		assert.Equal(t, exp[i], v)
 	}
 
+}
+
+func TestParseHeader(t *testing.T) {
+	con := []context{
+		context{
+			[]header{
+				header{
+					1, []string{"#tag1", "#tag2", "#tag3"},
+				},
+			},
+		},
+		context{
+			[]header{
+				header{
+					1, []string{"#tag11", "#tag12", "#tag13"},
+				},
+				header{
+					2, []string{"#tag21", "#tag22", "#tag23"},
+				},
+				header{
+					4, []string{"#tag41", "#tag42", "#tag43"},
+				},
+			},
+		},
+	}
+
+	ins := []string{
+		"# Header 1 #tag11, #tag12, #tag13",
+		"### Заголовок 1 #тег_1, #ещёТег #и_последний тег",
+	}
+
+	exp := []context{
+		context{
+			[]header{
+				header{
+					1, []string{"#tag11", "#tag12", "#tag13"},
+				},
+			},
+		},
+		context{
+			[]header{
+				header{
+					1, []string{"#tag11", "#tag12", "#tag13"},
+				},
+				header{
+					2, []string{"#tag21", "#tag22", "#tag23"},
+				},
+				header{
+					3, []string{"#тег_1", "#ещёТег", "#и_последний"},
+				},
+			},
+		},
+	}
+
+	if len(ins) != len(exp) && len(con) != len(exp) {
+		t.Fatal("Error in unit test: ins, exp and con has different length!")
+	}
+
+	for i := range exp {
+		v, err := parseHeader(con[i], ins[i])
+		assert.NoError(t, err)
+		if !exp[i].Equal(v) {
+			t.Error(
+				"Not equal:\n",
+				fmt.Sprintf("Expected: %q\n", exp[i]),
+				fmt.Sprintf("Actual: %q\n", v),
+			)
+		}
+	}
 }

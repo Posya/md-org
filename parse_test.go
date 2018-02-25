@@ -29,7 +29,7 @@ func TestParse(t *testing.T) {
 
 	exp := [][]task{
 		[]task{
-			task{3, "- [ ] First task", "First task", []string{}, ""},
+			task{3, 1, "- [ ] First task", "First task", []string{}, ""},
 		},
 	}
 

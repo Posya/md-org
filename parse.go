@@ -58,12 +58,14 @@ func parseTask(con context, s string) (task, context, error) {
 		return task{}, context{}, errors.New("Can't parse task (len(m[2])<1||len(m[3])<1): " + s)
 	}
 
-	taskIndent := len(m[1])
-	taskDone := m[2] != " "
-	taskText := m[3]
+	// taskIndent := len(m[1])
+	// taskDone := m[2] != " "
+	// taskText := m[3]
 
-	taskTags := tagsRegexp.FindAllString(taskText, -1)
-	taskDate := dateRegexp.FindString(taskText)
+	// taskTags := tagsRegexp.FindAllString(taskText, -1)
+	// taskDate := dateRegexp.FindString(taskText)
+
+	panic("")
 
 }
 
@@ -79,8 +81,8 @@ func parse(getNext func() (string, error)) ([]task, error) {
 			continue
 		case m[0] == '-':
 			//TODO: parseTask(s)
-			task, con, err := parseTask(con, s)
-			tasks = append(tasks, task)
+			// task, con, err := parseTask(con, s)
+			// tasks = append(tasks, task)
 		case m[0] == '#':
 			con, err = parseHeader(con, s)
 			if err != nil {

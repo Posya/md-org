@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-	"io"
 	"regexp"
 )
 
@@ -24,78 +22,78 @@ func init() {
 	dateRegexp = regexp.MustCompile(`!\((\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2}))?\)`)
 }
 
-func parseHeader(con context, s string) (context, error) {
-	m := headerRegexp.FindStringSubmatch(s)
-	if len(m) < 3 {
-		return context{}, errors.New("Can't parse header (len(m)<3): " + s)
-	}
-	if len(m[1]) < 1 || len(m[2]) < 1 {
-		return context{}, errors.New("Can't parse header (len(m[1])<1 || len(m[2])<1): " + s)
-	}
-	headerLevel := len(m[1])
-	headerText := m[2]
+// func parseHeader(con context, s string) (context, error) {
+// 	m := headerRegexp.FindStringSubmatch(s)
+// 	if len(m) < 3 {
+// 		return context{}, errors.New("Can't parse header (len(m)<3): " + s)
+// 	}
+// 	if len(m[1]) < 1 || len(m[2]) < 1 {
+// 		return context{}, errors.New("Can't parse header (len(m[1])<1 || len(m[2])<1): " + s)
+// 	}
+// 	headerLevel := len(m[1])
+// 	headerText := m[2]
 
-	headerTags := tagsRegexp.FindAllString(headerText, -1)
+// 	headerTags := tagsRegexp.FindAllString(headerText, -1)
 
-	for i := range con.headers {
-		if con.headers[i].level >= headerLevel {
-			con.headers = con.headers[:i+1]
-			con.headers[i].level = headerLevel
-			con.headers[i].tags = headerTags
-			return con, nil
-		}
-	}
-	con.headers = append(con.headers, header{headerLevel, headerTags})
-	return con, nil
-}
+// 	for i := range con.headers {
+// 		if con.headers[i].level >= headerLevel {
+// 			con.headers = con.headers[:i+1]
+// 			con.headers[i].level = headerLevel
+// 			con.headers[i].tags = headerTags
+// 			return con, nil
+// 		}
+// 	}
+// 	con.headers = append(con.headers, header{headerLevel, headerTags})
+// 	return con, nil
+// }
 
-func parseTask(con context, s string) (task, context, error) {
-	m := taskRegexp.FindStringSubmatch(s)
-	if len(m) < 4 {
-		return task{}, context{}, errors.New("Can't parse task (len(m)<4): " + s)
-	}
-	if len(m[2]) < 1 || len(m[3]) < 1 {
-		return task{}, context{}, errors.New("Can't parse task (len(m[2])<1||len(m[3])<1): " + s)
-	}
+// func parseTask(con context, s string) (task, context, error) {
+// 	m := taskRegexp.FindStringSubmatch(s)
+// 	if len(m) < 4 {
+// 		return task{}, context{}, errors.New("Can't parse task (len(m)<4): " + s)
+// 	}
+// 	if len(m[2]) < 1 || len(m[3]) < 1 {
+// 		return task{}, context{}, errors.New("Can't parse task (len(m[2])<1||len(m[3])<1): " + s)
+// 	}
 
-	// taskIndent := len(m[1])
-	// taskDone := m[2] != " "
-	// taskText := m[3]
+// 	// taskIndent := len(m[1])
+// 	// taskDone := m[2] != " "
+// 	// taskText := m[3]
 
-	// taskTags := tagsRegexp.FindAllString(taskText, -1)
-	// taskDate := dateRegexp.FindString(taskText)
+// 	// taskTags := tagsRegexp.FindAllString(taskText, -1)
+// 	// taskDate := dateRegexp.FindString(taskText)
 
-	panic("")
+// 	panic("")
 
-}
+// }
 
-func parse(getNext func() (string, error)) ([]task, error) {
-	var tasks []task
-	var err error
-	var con = newContext()
+// func parse(getNext func() (string, error)) ([]task, error) {
+// 	var tasks []task
+// 	var err error
+// 	var con = newContext()
 
-	for s, err := getNext(); err != nil; s, err = getNext() {
-		m := taskOrHeaderRegexp.FindString(s)
-		switch {
-		case len(m) == 0:
-			continue
-		case m[0] == '-':
-			//TODO: parseTask(s)
-			// task, con, err := parseTask(con, s)
-			// tasks = append(tasks, task)
-		case m[0] == '#':
-			con, err = parseHeader(con, s)
-			if err != nil {
-				return nil, err
-			}
-		default:
-			return nil, errors.New("Can't parse line: " + s)
-		}
-	}
+// 	for s, err := getNext(); err != nil; s, err = getNext() {
+// 		m := taskOrHeaderRegexp.FindString(s)
+// 		switch {
+// 		case len(m) == 0:
+// 			continue
+// 		case m[0] == '-':
+// 			//TODO: parseTask(s)
+// 			// task, con, err := parseTask(con, s)
+// 			// tasks = append(tasks, task)
+// 		case m[0] == '#':
+// 			con, err = parseHeader(con, s)
+// 			if err != nil {
+// 				return nil, err
+// 			}
+// 		default:
+// 			return nil, errors.New("Can't parse line: " + s)
+// 		}
+// 	}
 
-	if err != io.EOF {
-		return nil, err
-	}
+// 	if err != io.EOF {
+// 		return nil, err
+// 	}
 
-	return tasks, nil
-}
+// 	return tasks, nil
+// }

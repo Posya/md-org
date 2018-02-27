@@ -25,16 +25,16 @@ func TestHeaderEqual(t *testing.T) {
 
 }
 
-func TestIsParrent(t *testing.T) {
+func TestIsParent(t *testing.T) {
 	ins := []element{
 		header{12, 1, []string{}},
 		header{12, 1, []string{}},
 		header{12, 1, []string{}},
 		header{12, 1, []string{}},
-		task{12, 1, "asdf", "asdf", []string{}, ""},
-		task{12, 1, "asdf", "asdf", []string{}, ""},
-		task{12, 1, "asdf", "asdf", []string{}, ""},
-		task{12, 1, "asdf", "asdf", []string{}, ""},
+		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
+		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
+		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
+		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
 	}
 
 	level := []int{
@@ -75,7 +75,7 @@ func TestIsParrent(t *testing.T) {
 	}
 
 	for i := range exp {
-		assert.Equal(t, exp[i], ins[i].IsParrent(level[i], isTask[i]))
+		assert.Equal(t, exp[i], ins[i].IsParent(level[i], isTask[i]))
 	}
 
 }

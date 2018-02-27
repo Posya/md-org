@@ -1,7 +1,7 @@
 package main
 
 type element interface {
-	IsParrent(level int, isTask bool) bool
+	IsParent(level int, isTask bool) bool
 	getTags() []string
 	getN() int
 }
@@ -34,7 +34,7 @@ func (h header) Equal(other header) bool {
 	return true
 }
 
-func (h header) IsParrent(level int, isTask bool) bool {
+func (h header) IsParent(level int, isTask bool) bool {
 	if isTask == true {
 		return true
 	}
@@ -57,6 +57,7 @@ func (h header) getN() int {
 type task struct {
 	n        int
 	level    int
+	parent   int
 	original string
 	text     string
 	tags     []string
@@ -69,6 +70,10 @@ func (t task) Equal(other task) bool {
 	}
 
 	if t.level != other.level {
+		return false
+	}
+
+	if t.parent != other.parent {
 		return false
 	}
 
@@ -97,7 +102,7 @@ func (t task) Equal(other task) bool {
 	return true
 }
 
-func (t task) IsParrent(level int, isTask bool) bool {
+func (t task) IsParent(level int, isTask bool) bool {
 	if isTask == false {
 		return false
 	}

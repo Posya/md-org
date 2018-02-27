@@ -8,11 +8,11 @@ import (
 
 func TestHeaderEqual(t *testing.T) {
 	ins := []header{
-		header{12, 1, []string{"tag1", "tag2", "tag3"}},
+		header{12, 1, "", []string{"tag1", "tag2", "tag3"}},
 	}
 
 	exp := []header{
-		header{12, 1, []string{"tag1", "tag2", "tag3"}},
+		header{12, 1, "", []string{"tag1", "tag2", "tag3"}},
 	}
 
 	if len(ins) != len(exp) {
@@ -22,19 +22,18 @@ func TestHeaderEqual(t *testing.T) {
 	for i := range exp {
 		assert.True(t, exp[i].Equal(ins[i]))
 	}
-
 }
 
 func TestIsParent(t *testing.T) {
 	ins := []element{
-		header{12, 1, []string{}},
-		header{12, 1, []string{}},
-		header{12, 1, []string{}},
-		header{12, 1, []string{}},
-		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
-		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
-		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
-		task{12, 1, 0, "asdf", "asdf", []string{}, ""},
+		header{12, 1, "", []string{}},
+		header{12, 1, "", []string{}},
+		header{12, 1, "", []string{}},
+		header{12, 1, "", []string{}},
+		task{12, 1, false, 0, "asdf", []string{}, ""},
+		task{12, 1, false, 0, "asdf", []string{}, ""},
+		task{12, 1, false, 0, "asdf", []string{}, ""},
+		task{12, 1, false, 0, "asdf", []string{}, ""},
 	}
 
 	level := []int{

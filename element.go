@@ -9,6 +9,7 @@ type element interface {
 type header struct {
 	n     int
 	level int
+	text  string
 	tags  []string
 }
 
@@ -18,6 +19,10 @@ func (h header) Equal(other header) bool {
 	}
 
 	if h.level != other.level {
+		return false
+	}
+
+	if h.text != other.text {
 		return false
 	}
 
@@ -55,13 +60,13 @@ func (h header) getN() int {
 }
 
 type task struct {
-	n        int
-	level    int
-	parent   int
-	original string
-	text     string
-	tags     []string
-	date     string
+	n      int
+	level  int
+	done   bool
+	parent int
+	text   string
+	tags   []string
+	date   string
 }
 
 func (t task) Equal(other task) bool {
@@ -73,11 +78,11 @@ func (t task) Equal(other task) bool {
 		return false
 	}
 
-	if t.parent != other.parent {
+	if t.done != other.done {
 		return false
 	}
 
-	if t.original != other.original {
+	if t.parent != other.parent {
 		return false
 	}
 
@@ -121,5 +126,3 @@ func (t task) getTags() []string {
 func (t task) getN() int {
 	return t.n
 }
-
-// kfthxvveozuriwtc

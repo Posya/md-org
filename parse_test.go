@@ -2,6 +2,9 @@ package main
 
 import (
 	"io"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func getNextFunc(lines []string) func() (string, error) {
@@ -109,3 +112,25 @@ func getNextFunc(lines []string) func() (string, error) {
 // 		}
 // 	}
 // }
+
+func TestCheckDate(t *testing.T) {
+	ins := []string{
+		"2018.11.05",
+		"2018.11.5",
+		"2018.11.01 17:20",
+	}
+
+	exp := []bool{
+		true,
+		false,
+		true,
+	}
+
+	if len(ins) != len(exp) {
+		t.Fatal("Error in unit test: ins and exp has different length!")
+	}
+
+	for i := range exp {
+		assert.Equal(t, exp[i], checkDate(ins[i]))
+	}
+}

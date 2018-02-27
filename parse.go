@@ -1,7 +1,10 @@
 package main
 
 import (
+	"errors"
+	"io"
 	"regexp"
+	"time"
 )
 
 var (
@@ -11,6 +14,8 @@ var (
 	tagsRegexp         *regexp.Regexp
 	dateRegexp         *regexp.Regexp
 )
+
+var location = time.Now().Location()
 
 func init() {
 	taskOrHeaderRegexp = regexp.MustCompile(`^\s*(#+|-\s+\[[ xX]\])`)
@@ -22,78 +27,98 @@ func init() {
 	dateRegexp = regexp.MustCompile(`!\((\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2}))?\)`)
 }
 
-// func parseHeader(con context, s string) (context, error) {
-// 	m := headerRegexp.FindStringSubmatch(s)
-// 	if len(m) < 3 {
-// 		return context{}, errors.New("Can't parse header (len(m)<3): " + s)
-// 	}
-// 	if len(m[1]) < 1 || len(m[2]) < 1 {
-// 		return context{}, errors.New("Can't parse header (len(m[1])<1 || len(m[2])<1): " + s)
-// 	}
-// 	headerLevel := len(m[1])
-// 	headerText := m[2]
+func parseHeader(s string) (header, error) {
+	m := headerRegexp.FindStringSubmatch(s)
+	if len(m) < 3 {
+		return header{}, errors.New("Can't parse header (len(m)<3): " + s)
+	}
+	if len(m[1]) < 1 || len(m[2]) < 1 {
+		return header{}, errors.New("Can't parse header (len(m[1])<1 || len(m[2])<1): " + s)
+	}
+	headerLevel := len(m[1])
+	headerText := m[2]
 
-// 	headerTags := tagsRegexp.FindAllString(headerText, -1)
+	headerTags := tagsRegexp.FindAllString(headerText, -1)
 
-// 	for i := range con.headers {
-// 		if con.headers[i].level >= headerLevel {
-// 			con.headers = con.headers[:i+1]
-// 			con.headers[i].level = headerLevel
-// 			con.headers[i].tags = headerTags
-// 			return con, nil
-// 		}
-// 	}
-// 	con.headers = append(con.headers, header{headerLevel, headerTags})
-// 	return con, nil
-// }
+	return header{0, headerLevel, headerText, headerTags}, nil
+}
 
-// func parseTask(con context, s string) (task, context, error) {
-// 	m := taskRegexp.FindStringSubmatch(s)
-// 	if len(m) < 4 {
-// 		return task{}, context{}, errors.New("Can't parse task (len(m)<4): " + s)
-// 	}
-// 	if len(m[2]) < 1 || len(m[3]) < 1 {
-// 		return task{}, context{}, errors.New("Can't parse task (len(m[2])<1||len(m[3])<1): " + s)
-// 	}
+func parseTask(s string) (task, error) {
+	m := taskRegexp.FindStringSubmatch(s)
+	if len(m) < 4 {
+		return task{}, errors.New("Can't parse task (len(m)<4): " + s)
+	}
+	if len(m[2]) < 1 || len(m[3]) < 1 {
+		return task{}, errors.New("Can't parse task (len(m[2])<1||len(m[3])<1): " + s)
+	}
 
-// 	// taskIndent := len(m[1])
-// 	// taskDone := m[2] != " "
-// 	// taskText := m[3]
+	taskLevel := len(m[1])
+	taskDone := m[2] != " "
+	taskText := m[3]
 
-// 	// taskTags := tagsRegexp.FindAllString(taskText, -1)
-// 	// taskDate := dateRegexp.FindString(taskText)
+	taskTags := tagsRegexp.FindAllString(taskText, -1)
+	taskDate := dateRegexp.FindString(taskText)
 
-// 	panic("")
+	if !checkDate(taskDate) {
+		return task{}, errors.New("Can't parse task (wrong date): " + s)
+	}
 
-// }
+	return task{0, taskLevel, taskDone, 0, taskText, taskTags, taskDate}, nil
+}
 
-// func parse(getNext func() (string, error)) ([]task, error) {
-// 	var tasks []task
-// 	var err error
-// 	var con = newContext()
+func checkDate(s string) bool {
+	_, err1 := time.ParseInLocation("2006.01.02", s, location)
+	_, err2 := time.ParseInLocation("2006.01.02 15:04", s, location)
+	if err1 == nil || err2 == nil {
+		return true
+	}
+	return false
+}
 
-// 	for s, err := getNext(); err != nil; s, err = getNext() {
-// 		m := taskOrHeaderRegexp.FindString(s)
-// 		switch {
-// 		case len(m) == 0:
-// 			continue
-// 		case m[0] == '-':
-// 			//TODO: parseTask(s)
-// 			// task, con, err := parseTask(con, s)
-// 			// tasks = append(tasks, task)
-// 		case m[0] == '#':
-// 			con, err = parseHeader(con, s)
-// 			if err != nil {
-// 				return nil, err
-// 			}
-// 		default:
-// 			return nil, errors.New("Can't parse line: " + s)
-// 		}
-// 	}
+func parse(getNext func() (string, error)) ([]element, error) {
+	var elements []element
+	var err error
 
-// 	if err != io.EOF {
-// 		return nil, err
-// 	}
+	lineN := 0
 
-// 	return tasks, nil
-// }
+	for s, err := getNext(); err != nil; s, err = getNext() {
+		lineN++
+		m := taskOrHeaderRegexp.FindString(s)
+		switch {
+		case len(m) == 0:
+			continue
+		case m[0] == '-':
+			t, err := parseTask(s)
+			if err != nil {
+				return nil, err
+			}
+			for i := len(elements) - 1; i >= 0; i-- {
+				if elements[i].IsParent(t.level, false) {
+					t.tags = append(t.tags, elements[i].getTags()...)
+				}
+			}
+			t.n = lineN
+			elements = append(elements, t)
+		case m[0] == '#':
+			h, err := parseHeader(s)
+			if err != nil {
+				return nil, err
+			}
+			for i := len(elements) - 1; i >= 0; i-- {
+				if elements[i].IsParent(h.level, false) {
+					h.tags = append(h.tags, elements[i].getTags()...)
+				}
+			}
+			h.n = lineN
+			elements = append(elements, h)
+		default:
+			return nil, errors.New("Can't parse line: " + s)
+		}
+	}
+
+	if err != io.EOF {
+		return nil, err
+	}
+
+	return elements, nil
+}

@@ -1,119 +1,122 @@
 package main
 
 import (
-	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func getNextFunc(lines []string) func() (string, error) {
-	i := 0
-	var next = func() (string, error) {
-		if len(lines) == i {
-			return "", io.EOF
-		}
-
-		ret := lines[i]
-		i++
-		return ret, nil
+func TestParse(t *testing.T) {
+	ins := [][]string{
+		[]string{
+			"Первая строка",
+			"# Заголовок 1",
+			"- [ ] First task",
+		},
+		[]string{
+			"asdfasdfasdf asdfasdfasdf",
+			"# Заголовок 1",
+			"asdfasdfasdf asdfasdfasdf",
+			" # Заголовок 2",
+			"asdfasdfasdf asdfasdfasdf",
+			"## Заголовок 2.1",
+			"## Заголовок 2.2",
+			"asdfasdfasdf asdfasdfasdf",
+			"- [ ] First task 1",
+			"	- [ ] First task 1.1",
+			"	- [ ] First task 1.2",
+			"asdfasdfasdf asdfasdfasdf",
+			"		- [ ] First task 1.2.1",
+			" # Заголовок 3",
+			"## Заголовок 3.1",
+			"asdfasdfasdf asdfasdfasdf",
+			"		- [ ] First task 3",
+			"- [ ] First task 4",
+			"	- [ ] First task 4.1",
+			"asdfasdfasdf asdfasdfasdf",
+			"	- [ ] First task 4.2",
+		},
 	}
-	return next
+
+	exp := [][]element{
+		[]element{
+			header{2, 1, 0, "Заголовок 1", []string{}},
+			task{3, 0, 2, false, "First task", []string{}, ""},
+		},
+		[]element{
+			header{2, 1, 0, "Заголовок 1", []string{}},
+			header{4, 1, 0, "Заголовок 2", []string{}},
+			header{6, 2, 4, "Заголовок 2.1", []string{}},
+			header{7, 2, 4, "Заголовок 2.2", []string{}},
+			task{9, 0, 7, false, "First task 1", []string{}, ""},
+			task{10, 1, 9, false, "First task 1.1", []string{}, ""},
+			task{11, 1, 9, false, "First task 1.2", []string{}, ""},
+			task{13, 2, 11, false, "First task 1.2.1", []string{}, ""},
+			header{14, 1, 0, "Заголовок 3", []string{}},
+			header{15, 2, 14, "Заголовок 3.1", []string{}},
+			task{17, 2, 15, false, "First task 3", []string{}, ""},
+			task{18, 0, 15, false, "First task 4", []string{}, ""},
+			task{19, 1, 18, false, "First task 4.1", []string{}, ""},
+			task{21, 1, 18, false, "First task 4.2", []string{}, ""},
+		},
+	}
+
+	if len(ins) != len(exp) {
+		t.Fatal("Error in unit test: ins and exp has different length!")
+	}
+
+	for i := range exp {
+		v, err := parse(ins[i])
+		assert.NoError(t, err)
+		assert.Equal(t, exp[i], v)
+	}
 }
 
-// func TestParse(t *testing.T) {
-// 	ins := [][]string{
-// 		[]string{"Первая строка", "# Заголовок 1", "- [ ] First task"},
-// 	}
+func TestParseHeader(t *testing.T) {
+	ins := []string{
+		"# Header 1 #tag11, #tag12, #tag13",
+		"### Заголовок 1 #тег_1, #ещёТег #и_последний тег",
+		" # Заголовок с пробелом и с #тегами",
+	}
 
-// 	exp := [][]task{
-// 		[]task{
-// 			task{3, 1, "- [ ] First task", "First task", []string{}, ""},
-// 		},
-// 	}
+	exp := []header{
+		header{0, 1, 0, "Header 1 #tag11, #tag12, #tag13", []string{"#tag11", "#tag12", "#tag13"}},
+		header{0, 3, 0, "Заголовок 1 #тег_1, #ещёТег #и_последний тег", []string{"#тег_1", "#ещёТег", "#и_последний"}},
+		header{0, 1, 0, "Заголовок с пробелом и с #тегами", []string{"#тегами"}},
+	}
 
-// 	if len(ins) != len(exp) {
-// 		t.Fatal("Error in unit test: ins and exp has different length!")
-// 	}
+	if len(ins) != len(exp) {
+		t.Fatal("Error in unit test: ins, exp and con has different length!")
+	}
 
-// 	for i := range exp {
-// 		v, err := parse(getNextFunc(ins[i]))
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, exp[i], v)
-// 	}
+	for i := range exp {
+		v, err := parseHeader(ins[i])
+		assert.NoError(t, err)
+		assert.Equal(t, exp[i], v)
+	}
+}
 
-// }
+func TestParseTask(t *testing.T) {
+	ins := []string{
+		"- [ ] Task 1",
+	}
 
-// func TestParseHeader(t *testing.T) {
-// 	con := []context{
-// 		context{
-// 			[]header{
-// 				header{
-// 					1, []string{"#tag1", "#tag2", "#tag3"},
-// 				},
-// 			},
-// 		},
-// 		context{
-// 			[]header{
-// 				header{
-// 					1, []string{"#tag11", "#tag12", "#tag13"},
-// 				},
-// 				header{
-// 					2, []string{"#tag21", "#tag22", "#tag23"},
-// 				},
-// 				header{
-// 					4, []string{"#tag41", "#tag42", "#tag43"},
-// 				},
-// 			},
-// 		},
-// 	}
+	exp := []task{
+		task{0, 0, 0, false, "Task 1", []string{}, ""},
+	}
 
-// 	ins := []string{
-// 		"# Header 1 #tag11, #tag12, #tag13",
-// 		"### Заголовок 1 #тег_1, #ещёТег #и_последний тег",
-// 	}
+	if len(ins) != len(exp) {
+		t.Fatal("Error in unit test: ins, exp and con has different length!")
+	}
 
-// 	exp := []context{
-// 		context{
-// 			[]header{
-// 				header{
-// 					1, []string{"#tag11", "#tag12", "#tag13"},
-// 				},
-// 			},
-// 		},
-// 		context{
-// 			[]header{
-// 				header{
-// 					1, []string{"#tag11", "#tag12", "#tag13"},
-// 				},
-// 				header{
-// 					2, []string{"#tag21", "#tag22", "#tag23"},
-// 				},
-// 				header{
-// 					3, []string{"#тег_1", "#ещёТег", "#и_последний"},
-// 				},
-// 			},
-// 		},
-// 	}
+	for i := range exp {
+		v, err := parseTask(ins[i])
+		assert.NoError(t, err)
+		assert.Equal(t, exp[i], v)
+	}
+}
 
-// 	if len(ins) != len(exp) && len(con) != len(exp) {
-// 		t.Fatal("Error in unit test: ins, exp and con has different length!")
-// 	}
-
-// 	for i := range exp {
-// 		v, err := parseHeader(con[i], ins[i])
-// 		assert.NoError(t, err)
-// 		if !exp[i].Equal(v) {
-// 			t.Error(
-// 				"Not equal:\n",
-// 				fmt.Sprintf("Expected: %q\n", exp[i]),
-// 				fmt.Sprintf("Actual: %q\n", v),
-// 			)
-// 		}
-// 	}
-// }
-
-func TestCheckDate(t *testing.T) {
+func TestDateIsCorrect(t *testing.T) {
 	ins := []string{
 		"2018.11.05",
 		"2018.11.5",
@@ -131,6 +134,6 @@ func TestCheckDate(t *testing.T) {
 	}
 
 	for i := range exp {
-		assert.Equal(t, exp[i], checkDate(ins[i]))
+		assert.Equal(t, exp[i], dateIsCorrect(ins[i]))
 	}
 }

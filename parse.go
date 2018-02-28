@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"io"
 	"regexp"
 	"time"
 )
@@ -39,8 +38,11 @@ func parseHeader(s string) (header, error) {
 	headerText := m[2]
 
 	headerTags := tagsRegexp.FindAllString(headerText, -1)
+	if headerTags == nil {
+		headerTags = []string{}
+	}
 
-	return header{0, headerLevel, headerText, headerTags}, nil
+	return header{0, headerLevel, 0, headerText, headerTags}, nil
 }
 
 func parseTask(s string) (task, error) {
@@ -57,16 +59,23 @@ func parseTask(s string) (task, error) {
 	taskText := m[3]
 
 	taskTags := tagsRegexp.FindAllString(taskText, -1)
+	if taskTags == nil {
+		taskTags = []string{}
+	}
+
 	taskDate := dateRegexp.FindString(taskText)
 
-	if !checkDate(taskDate) {
+	if !dateIsCorrect(taskDate) {
 		return task{}, errors.New("Can't parse task (wrong date): " + s)
 	}
 
-	return task{0, taskLevel, taskDone, 0, taskText, taskTags, taskDate}, nil
+	return task{0, taskLevel, 0, taskDone, taskText, taskTags, taskDate}, nil
 }
 
-func checkDate(s string) bool {
+func dateIsCorrect(s string) bool {
+	if s == "" {
+		return true
+	}
 	_, err1 := time.ParseInLocation("2006.01.02", s, location)
 	_, err2 := time.ParseInLocation("2006.01.02 15:04", s, location)
 	if err1 == nil || err2 == nil {
@@ -75,49 +84,47 @@ func checkDate(s string) bool {
 	return false
 }
 
-func parse(getNext func() (string, error)) ([]element, error) {
-	var elements []element
-	var err error
+func parse(lines []string) ([]element, error) {
+	elements := []element{}
 
-	lineN := 0
-
-	for s, err := getNext(); err != nil; s, err = getNext() {
-		lineN++
-		m := taskOrHeaderRegexp.FindString(s)
-		switch {
-		case len(m) == 0:
+	for lineN := range lines {
+		m := taskOrHeaderRegexp.FindStringSubmatch(lines[lineN])
+		if m == nil {
 			continue
-		case m[0] == '-':
-			t, err := parseTask(s)
+		}
+
+		switch {
+		case m[1][0] == '-':
+			t, err := parseTask(lines[lineN])
 			if err != nil {
 				return nil, err
 			}
 			for i := len(elements) - 1; i >= 0; i-- {
-				if elements[i].IsParent(t.level, false) {
+				if elements[i].IsParent(t.level, true) {
 					t.tags = append(t.tags, elements[i].getTags()...)
+					t.parent = elements[i].getN()
+					break
 				}
 			}
-			t.n = lineN
+			t.n = lineN + 1
 			elements = append(elements, t)
-		case m[0] == '#':
-			h, err := parseHeader(s)
+		case m[1][0] == '#':
+			h, err := parseHeader(lines[lineN])
 			if err != nil {
 				return nil, err
 			}
 			for i := len(elements) - 1; i >= 0; i-- {
 				if elements[i].IsParent(h.level, false) {
 					h.tags = append(h.tags, elements[i].getTags()...)
+					h.parent = elements[i].getN()
+					break
 				}
 			}
-			h.n = lineN
+			h.n = lineN + 1
 			elements = append(elements, h)
 		default:
-			return nil, errors.New("Can't parse line: " + s)
+			return nil, errors.New("Can't parse line: " + lines[lineN])
 		}
-	}
-
-	if err != io.EOF {
-		return nil, err
 	}
 
 	return elements, nil

@@ -6,34 +6,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHeaderEqual(t *testing.T) {
-	ins := []header{
-		header{12, 1, "", []string{"tag1", "tag2", "tag3"}},
-	}
-
-	exp := []header{
-		header{12, 1, "", []string{"tag1", "tag2", "tag3"}},
-	}
-
-	if len(ins) != len(exp) {
-		t.Fatal("Error in unit test: ins and exp has different length!")
-	}
-
-	for i := range exp {
-		assert.True(t, exp[i].Equal(ins[i]))
-	}
-}
-
 func TestIsParent(t *testing.T) {
 	ins := []element{
-		header{12, 1, "", []string{}},
-		header{12, 1, "", []string{}},
-		header{12, 1, "", []string{}},
-		header{12, 1, "", []string{}},
-		task{12, 1, false, 0, "asdf", []string{}, ""},
-		task{12, 1, false, 0, "asdf", []string{}, ""},
-		task{12, 1, false, 0, "asdf", []string{}, ""},
-		task{12, 1, false, 0, "asdf", []string{}, ""},
+		header{12, 1, 0, "", []string{}},
+		header{12, 1, 0, "", []string{}},
+		header{12, 1, 0, "", []string{}},
+		header{12, 1, 0, "", []string{}},
+		task{12, 1, 0, false, "asdf", []string{}, ""},
+		task{12, 1, 0, false, "asdf", []string{}, ""},
+		task{12, 1, 0, false, "asdf", []string{}, ""},
+		task{12, 1, 0, false, "asdf", []string{}, ""},
 	}
 
 	level := []int{

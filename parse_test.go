@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,12 +28,12 @@ func TestParse(t *testing.T) {
 			"	- [ ] First task 1.2",
 			"asdfasdfasdf asdfasdfasdf",
 			"		- [ ] First task 1.2.1",
-			" # Заголовок 3",
-			"## Заголовок 3.1",
+			" # Заголовок 3 #tag1",
+			"## Заголовок 3.1 #tag1_1 ",
 			"asdfasdfasdf asdfasdfasdf",
-			"		- [ ] First task 3",
+			"		- [ ] First task 3 #task_tag_1",
 			"- [ ] First task 4",
-			"	- [ ] First task 4.1",
+			"	- [ ] First task 4.1 !(2018.03.01) сделать.",
 			"asdfasdfasdf asdfasdfasdf",
 			"	- [ ] First task 4.2",
 		},
@@ -52,12 +53,12 @@ func TestParse(t *testing.T) {
 			task{10, 1, 9, false, "First task 1.1", []string{}, ""},
 			task{11, 1, 9, false, "First task 1.2", []string{}, ""},
 			task{13, 2, 11, false, "First task 1.2.1", []string{}, ""},
-			header{14, 1, 0, "Заголовок 3", []string{}},
-			header{15, 2, 14, "Заголовок 3.1", []string{}},
-			task{17, 2, 15, false, "First task 3", []string{}, ""},
-			task{18, 0, 15, false, "First task 4", []string{}, ""},
-			task{19, 1, 18, false, "First task 4.1", []string{}, ""},
-			task{21, 1, 18, false, "First task 4.2", []string{}, ""},
+			header{14, 1, 0, "Заголовок 3 #tag1", []string{"#tag1"}},
+			header{15, 2, 14, "Заголовок 3.1 #tag1_1 ", []string{"#tag1_1", "#tag1"}},
+			task{17, 2, 15, false, "First task 3 #task_tag_1", []string{"#task_tag_1", "#tag1_1", "#tag1"}, ""},
+			task{18, 0, 15, false, "First task 4", []string{"#tag1_1", "#tag1"}, ""},
+			task{19, 1, 18, false, "First task 4.1 !(2018.03.01) сделать.", []string{"#tag1_1", "#tag1"}, "2018.03.01"},
+			task{21, 1, 18, false, "First task 4.2", []string{"#tag1_1", "#tag1"}, ""},
 		},
 	}
 
@@ -134,6 +135,6 @@ func TestDateIsCorrect(t *testing.T) {
 	}
 
 	for i := range exp {
-		assert.Equal(t, exp[i], dateIsCorrect(ins[i]))
+		assert.Equal(t, exp[i], dateIsCorrect(ins[i]), "error in date (must be "+strconv.FormatBool(exp[i])+"): "+ins[i])
 	}
 }

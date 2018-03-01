@@ -23,7 +23,7 @@ func init() {
 	// TODO: Check for # in the middle
 	tagsRegexp = regexp.MustCompile(`#[\p{L}\d_]+`)
 	// TODO: Check for a dete in the middle
-	dateRegexp = regexp.MustCompile(`!\((\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2}))?\)`)
+	dateRegexp = regexp.MustCompile(`!\((\d{4})[\/.-](\d{2})[\/.-](\d{2})(?: (\d{2})[.:](\d{2}))?\)`)
 }
 
 func parseHeader(s string) (header, error) {
@@ -63,7 +63,8 @@ func parseTask(s string) (task, error) {
 		taskTags = []string{}
 	}
 
-	taskDate := dateRegexp.FindString(taskText)
+	taskDateParts := dateRegexp.FindStringSubmatch(taskText)
+	taskDate := buildDate(taskDateParts)
 
 	if !dateIsCorrect(taskDate) {
 		return task{}, errors.New("Can't parse task (wrong date): " + s)
@@ -72,16 +73,34 @@ func parseTask(s string) (task, error) {
 	return task{0, taskLevel, 0, taskDone, taskText, taskTags, taskDate}, nil
 }
 
+func buildDate(parts []string) string {
+	if len(parts) == 0 {
+		return ""
+	}
+
+	res := parts[1] + "." + parts[2] + "." + parts[3]
+	if parts[4] != "" && parts[5] != "" {
+		res = res + " " + parts[4] + ":" + parts[5]
+	}
+
+	return res
+}
+
+func tryDateFormat(format, str string) bool {
+	_, err := time.ParseInLocation(format, str, location)
+	if err == nil {
+		return true
+	}
+	return false
+}
+
 func dateIsCorrect(s string) bool {
 	if s == "" {
 		return true
 	}
-	_, err1 := time.ParseInLocation("2006.01.02", s, location)
-	_, err2 := time.ParseInLocation("2006.01.02 15:04", s, location)
-	if err1 == nil || err2 == nil {
-		return true
-	}
-	return false
+
+	return tryDateFormat("2006.01.02", s) ||
+		tryDateFormat("2006.01.02 15:04", s)
 }
 
 func parse(lines []string) ([]element, error) {

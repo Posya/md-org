@@ -67,3 +67,11 @@ func (t task) getTags() []string {
 func (t task) getN() int {
 	return t.n
 }
+
+func (h task) FilterByTag(tag string) bool {
+	panic("")
+}
+
+func (h task) FilterByDate(from, to string) bool {
+	panic("")
+}

@@ -57,3 +57,11 @@ func (h header) getTags() []string {
 func (h header) getN() int {
 	return h.n
 }
+
+func (h header) FilterByTag(tag string) bool {
+	panic("")
+}
+
+func (h header) FilterByDate(from, to string) bool {
+	panic("")
+}

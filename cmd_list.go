@@ -18,7 +18,7 @@ func (cl *cmdList) Execute(args []string) error {
 			return err
 		}
 
-		elem, err := parse(lines)
+		_, err = parse(lines)
 		if err != nil {
 			return err
 		}

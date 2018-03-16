@@ -59,9 +59,14 @@ func (h header) getN() int {
 }
 
 func (h header) FilterByTag(tag string) bool {
-	panic("")
+	for _, ct := range h.tags {
+		if ct == tag {
+			return true
+		}
+	}
+	return false
 }
 
 func (h header) FilterByDate(from, to string) bool {
-	panic("")
+	return false
 }

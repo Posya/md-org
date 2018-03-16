@@ -68,10 +68,18 @@ func (t task) getN() int {
 	return t.n
 }
 
-func (h task) FilterByTag(tag string) bool {
-	panic("")
+func (t task) FilterByTag(tag string) bool {
+	for _, ct := range t.tags {
+		if ct == tag {
+			return true
+		}
+	}
+	return false
 }
 
-func (h task) FilterByDate(from, to string) bool {
-	panic("")
+func (t task) FilterByDate(from, to string) bool {
+	if from <= t.date && t.date <= to {
+		return true
+	}
+	return false
 }

@@ -60,3 +60,71 @@ func TestIsParent(t *testing.T) {
 	}
 
 }
+
+func TestFilterByTag(t *testing.T) {
+
+	ins := []element{
+		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
+		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
+		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
+		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
+		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
+		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
+		header{0, 0, 0, "Header 1", []string{}},
+		task{0, 0, 0, false, "Task1", []string{}, ""},
+	}
+
+	tags := []string{
+		"#Tag1",
+		"#Tag1",
+		"",
+		"",
+		"#Tag3",
+		"#Tag3",
+		"#Tag1",
+		"#Tag1",
+	}
+
+	exp := []bool{
+		true,
+		true,
+		false,
+		false,
+		false,
+		false,
+		false,
+		false,
+	}
+
+	if len(ins) != len(exp) || len(tags) != len(exp) {
+		t.Fatal("Error in unit test: ins and exp has different length!")
+	}
+
+	for i := range exp {
+		assert.Equal(t, exp[i], ins[i].FilterByTag(tags[i]))
+	}
+
+}
+
+func TestFilterByDate(t *testing.T) {
+
+	ins := []element{
+		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
+		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
+	}
+
+	from := []string{}
+
+	to := []string{}
+
+	exp := []bool{}
+
+	if len(ins) != len(exp) || len(from) != len(exp) || len(to) != len(exp) {
+		t.Fatal("Error in unit test: ins and exp has different length!")
+	}
+
+	for i := range exp {
+		assert.Equal(t, exp[i], ins[i].FilterByDate(from[i], to[i]))
+	}
+
+}

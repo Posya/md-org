@@ -58,7 +58,15 @@ func (h header) getN() int {
 	return h.n
 }
 
-func (h header) FilterByTag(tag string) bool {
+func (h header) HasTag(tag string) bool {
+	if tag == "" {
+		return true
+	}
+
+	if tag[0] != '#' {
+		tag = "#" + tag
+	}
+
 	for _, ct := range h.tags {
 		if ct == tag {
 			return true
@@ -67,6 +75,6 @@ func (h header) FilterByTag(tag string) bool {
 	return false
 }
 
-func (h header) FilterByDate(from, to string) bool {
+func (h header) Between(from, to string) bool {
 	return false
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// ReadFile reads all file content to slice
 func ReadFile(path string) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -22,6 +23,7 @@ func ReadFile(path string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
+// WriteFile writes slice content to file
 func WriteFile(lines []string, path string) error {
 	file, err := os.Create(path)
 	if err != nil {
@@ -36,7 +38,8 @@ func WriteFile(lines []string, path string) error {
 	return w.Flush()
 }
 
-func GetDir() ([]string, error) {
+// GetDirList returns list of current *.md-ord files as slice
+func GetDirList() ([]string, error) {
 	ret := []string{}
 
 	files, err := ioutil.ReadDir("./*.md-org")
@@ -50,9 +53,10 @@ func GetDir() ([]string, error) {
 	return ret, nil
 }
 
+// DirFromOptsOrCurrent returns files list from opts, or current dir
 func DirFromOptsOrCurrent() ([]string, error) {
 	if len(opts.File) > 0 {
 		return opts.File, nil
 	}
-	return GetDir()
+	return GetDirList()
 }

@@ -63,68 +63,25 @@ func TestIsParent(t *testing.T) {
 
 func TestFilterByTag(t *testing.T) {
 
-	ins := []element{
-		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
-		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
-		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
-		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
-		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
-		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
-		header{0, 0, 0, "Header 1", []string{}},
-		task{0, 0, 0, false, "Task1", []string{}, ""},
+	test := map[string]element{
+		"header without tags": header{0, 0, 0, "Header 1", []string{}},
+		"header with tags":    header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
+
+		"task without tags": task{0, 0, 0, false, "Task1", []string{}, ""},
+		"task with tags":    task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
 	}
 
-	tags := []string{
-		"#Tag1",
-		"#Tag1",
-		"",
-		"",
-		"#Tag3",
-		"#Tag3",
-		"#Tag1",
-		"#Tag1",
-	}
+	assert.Equal(t, false, test["header without tags"].HasTag("#TestTag"))
+	assert.Equal(t, false, test["header with tags"].HasTag("#WrongTag"))
+	assert.Equal(t, true, test["header with tags"].HasTag("#Tag1"))
+	assert.Equal(t, true, test["header without tags"].HasTag(""))
+	assert.Equal(t, true, test["header with tags"].HasTag(""))
+	assert.Equal(t, true, test["header with tags"].HasTag("Tag1"))
 
-	exp := []bool{
-		true,
-		true,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-	}
-
-	if len(ins) != len(exp) || len(tags) != len(exp) {
-		t.Fatal("Error in unit test: ins and exp has different length!")
-	}
-
-	for i := range exp {
-		assert.Equal(t, exp[i], ins[i].FilterByTag(tags[i]))
-	}
-
-}
-
-func TestFilterByDate(t *testing.T) {
-
-	ins := []element{
-		header{0, 0, 0, "Header 1", []string{"#Tag1", "#Tag2"}},
-		task{0, 0, 0, false, "Task1", []string{"#Tag1", "#Tag2"}, ""},
-	}
-
-	from := []string{}
-
-	to := []string{}
-
-	exp := []bool{}
-
-	if len(ins) != len(exp) || len(from) != len(exp) || len(to) != len(exp) {
-		t.Fatal("Error in unit test: ins and exp has different length!")
-	}
-
-	for i := range exp {
-		assert.Equal(t, exp[i], ins[i].FilterByDate(from[i], to[i]))
-	}
-
+	assert.Equal(t, false, test["task without tags"].HasTag("#TestTag"))
+	assert.Equal(t, false, test["task with tags"].HasTag("#WrongTag"))
+	assert.Equal(t, true, test["task with tags"].HasTag("#Tag1"))
+	assert.Equal(t, true, test["task without tags"].HasTag(""))
+	assert.Equal(t, true, test["task with tags"].HasTag(""))
+	assert.Equal(t, true, test["task with tags"].HasTag("Tag1"))
 }

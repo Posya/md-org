@@ -68,7 +68,15 @@ func (t task) getN() int {
 	return t.n
 }
 
-func (t task) FilterByTag(tag string) bool {
+func (t task) HasTag(tag string) bool {
+	if tag == "" {
+		return true
+	}
+
+	if tag[0] != '#' {
+		tag = "#" + tag
+	}
+
 	for _, ct := range t.tags {
 		if ct == tag {
 			return true
@@ -77,7 +85,7 @@ func (t task) FilterByTag(tag string) bool {
 	return false
 }
 
-func (t task) FilterByDate(from, to string) bool {
+func (t task) Between(from, to string) bool {
 	if from <= t.date && t.date <= to {
 		return true
 	}

@@ -40,7 +40,7 @@ func WriteFile(lines []string, path string) error {
 
 // GetDirList returns list of current *.md-ord files as slice
 func GetDirList() ([]string, error) {
-	files, err := filepath.Glob("./*.md-org")
+	files, err := filepath.Glob("./*.org.md")
 	if err != nil {
 		return nil, err
 	}

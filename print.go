@@ -9,6 +9,7 @@ import (
 type OutBuilder struct {
 	_elements    []element
 	_showAllTags bool
+	_Indent      bool
 }
 
 // NewOutBuilder returns new OutBuilder struct
@@ -26,25 +27,33 @@ func (ob *OutBuilder) ShowAllTags() OutBuilder {
 	return *ob
 }
 
+// Indent swiches indents on
+func (ob *OutBuilder) Indent() OutBuilder {
+	ob._Indent = true
+	return *ob
+}
+
 // Build builds result slice
 func (ob OutBuilder) Build() []string {
 	res := []string{}
-	indent := 0
-	currentParrent := 0
+	indents := getIndents(ob._elements, ob._Indent)
 
 	for _, el := range ob._elements {
 		line := ""
-		if el.
+		tags := ""
+		if ob._showAllTags && len(el.getTags()) > 0 {
+			tags = "\t" + strings.Join(el.getTags(), " ")
+		}
 
 		switch v := el.(type) {
 		case header:
-			line = fmt.Sprintf("%s%s", strings.Repeat("\t", indent), v.text)
+			line = fmt.Sprintf("%s%s%s", strings.Repeat("\t", indents[v.n]), v.text, tags)
 		case task:
 			isDone := " "
 			if v.done {
 				isDone = "X"
 			}
-			line = fmt.Sprintf("%s[%s] %s", strings.Repeat("\t", indent), isDone, v.text)
+			line = fmt.Sprintf("%s[%s] %s%s", strings.Repeat("\t", indents[v.n]), isDone, v.text, tags)
 		default:
 			panic("Something goes wrong: element has to be task or header only")
 		}

@@ -22,6 +22,10 @@ func (t task) IsParent(level int, isTask bool) bool {
 	return false
 }
 
+func (t task) getParent() int {
+	return t.parent
+}
+
 func (t task) getTags() []string {
 	return t.tags
 }

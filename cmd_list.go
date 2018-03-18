@@ -1,10 +1,10 @@
 package main
 
+import "fmt"
+
 type cmdList struct {
-	// From        string `long:"from" description:"from date"`
-	// To          string `long:"to" description:"to date"`
-	ShowAllTags bool     `short:"a" long:"all" description:"show all tags (local and inherited)"`
-	Tags        []string `short:"t" long:"tag" description:"tag to filter"`
+	ShowAllTags bool `short:"t" long:"tags" description:"show all tags (local and inherited)"`
+	NoItdent    bool `short:"i" long:"noindent" description:"print list without indents"`
 }
 
 func (cl *cmdList) Execute(args []string) error {
@@ -25,16 +25,16 @@ func (cl *cmdList) Execute(args []string) error {
 			return err
 		}
 
-		filterVar := func(elem element) bool {
-			for _, tag := range cl.Tags {
-				if elem.HasTag(tag) {
-					return true
-				}
-			}
-			return false
+		out := NewOutBuilder(elements)
+		if cl.ShowAllTags {
+			out = out.ShowAllTags()
 		}
-		elements = filterElements(elements, filterVar)
-
+		if !cl.NoItdent {
+			out = out.Indent()
+		}
+		for _, l := range out.Build() {
+			fmt.Println(l)
+		}
 	}
 
 	return nil

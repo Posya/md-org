@@ -20,6 +20,10 @@ func (h header) IsParent(level int, isTask bool) bool {
 	return false
 }
 
+func (h header) getParent() int {
+	return h.parent
+}
+
 func (h header) getTags() []string {
 	return h.tags
 }

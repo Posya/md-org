@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 // ReadFile reads all file content to slice
@@ -40,17 +40,11 @@ func WriteFile(lines []string, path string) error {
 
 // GetDirList returns list of current *.md-ord files as slice
 func GetDirList() ([]string, error) {
-	ret := []string{}
-
-	files, err := ioutil.ReadDir("./*.md-org")
+	files, err := filepath.Glob("./*.md-org")
 	if err != nil {
 		return nil, err
 	}
-	for _, file := range files {
-		ret = append(ret, file.Name())
-	}
-
-	return ret, nil
+	return files, nil
 }
 
 // DirFromOptsOrCurrent returns files list from opts, or current dir

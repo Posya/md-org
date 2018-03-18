@@ -14,6 +14,8 @@ func (cl *cmdList) Execute(args []string) error {
 	}
 
 	for _, file := range dir {
+		fmt.Println("File: ", file)
+		fmt.Println()
 
 		lines, err := ReadFile(file)
 		if err != nil {
@@ -35,6 +37,8 @@ func (cl *cmdList) Execute(args []string) error {
 		for _, l := range out.Build() {
 			fmt.Println(l)
 		}
+
+		fmt.Println()
 	}
 
 	return nil

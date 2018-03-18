@@ -9,8 +9,8 @@ import (
 func TestBuild(t *testing.T) {
 	elem := []element{
 		header{n: 1, level: 1, parent: 0, text: "Заголовок 1", tags: []string{}},
-		task{n: 2, level: 3, parent: 1, done: false, text: "Задача 1.1", tags: []string{}, date: ""},
-		task{n: 3, level: 3, parent: 1, done: true, text: "Задача 1.2", tags: []string{}, date: ""},
+		task{n: 2, level: 3, parent: 1, done: false, text: "Задача 1.1 !(2018-03-18)", tags: []string{}, date: "2018-03-18"},
+		task{n: 3, level: 3, parent: 1, done: true, text: "Задача 1.2 !(2018-03-18 12:00)", tags: []string{}, date: "2018-03-18 12:00"},
 		header{n: 4, level: 2, parent: 1, text: "Заголовок 1.1", tags: []string{}},
 		task{n: 5, level: 6, parent: 4, done: false, text: "Задача 1.1.1", tags: []string{}, date: ""},
 		task{n: 6, level: 6, parent: 4, done: true, text: "Задача 1.1.2", tags: []string{}, date: ""},
@@ -21,43 +21,46 @@ func TestBuild(t *testing.T) {
 
 	ob := NewOutBuilder(elem)
 	exp := []string{
-		"# Заголовок 1",
-		"\t- [ ] Задача 1.1",
-		"\t- [X] Задача 1.2",
-		"\t## Заголовок 1.1",
-		"\t\t- [ ] Задача 1.1.1",
-		"\t\t- [X] Задача 1.1.2",
-		"# Заголовок 2 #header_tag",
-		"\t- [ ] Задача 2.1 #task1_tag",
-		"\t- [X] Задача 2.2 #task2_tag",
+		"N\tText\t",
+		"1\t# Заголовок 1\t",
+		"2\t  - [ ] Задача 1.1 !(2018-03-18)\t",
+		"3\t  - [X] Задача 1.2 !(2018-03-18 12:00)\t",
+		"4\t  ## Заголовок 1.1\t",
+		"5\t    - [ ] Задача 1.1.1\t",
+		"6\t    - [X] Задача 1.1.2\t",
+		"7\t# Заголовок 2 #header_tag\t",
+		"8\t  - [ ] Задача 2.1 #task1_tag\t",
+		"9\t  - [X] Задача 2.2 #task2_tag\t",
 	}
 	assert.Equal(t, exp, ob.Indent().Build())
 
 	ob = NewOutBuilder(elem)
 	exp = []string{
-		"# Заголовок 1",
-		"- [ ] Задача 1.1",
-		"- [X] Задача 1.2",
-		"## Заголовок 1.1",
-		"- [ ] Задача 1.1.1",
-		"- [X] Задача 1.1.2",
-		"# Заголовок 2 #header_tag",
-		"- [ ] Задача 2.1 #task1_tag",
-		"- [X] Задача 2.2 #task2_tag",
+		"N\tText\t",
+		"1\t# Заголовок 1\t",
+		"2\t- [ ] Задача 1.1 !(2018-03-18)\t",
+		"3\t- [X] Задача 1.2 !(2018-03-18 12:00)\t",
+		"4\t## Заголовок 1.1\t",
+		"5\t- [ ] Задача 1.1.1\t",
+		"6\t- [X] Задача 1.1.2\t",
+		"7\t# Заголовок 2 #header_tag\t",
+		"8\t- [ ] Задача 2.1 #task1_tag\t",
+		"9\t- [X] Задача 2.2 #task2_tag\t",
 	}
 	assert.Equal(t, exp, ob.Build())
 
 	ob = NewOutBuilder(elem)
 	exp = []string{
-		"# Заголовок 1",
-		"- [ ] Задача 1.1",
-		"- [X] Задача 1.2",
-		"## Заголовок 1.1",
-		"- [ ] Задача 1.1.1",
-		"- [X] Задача 1.1.2",
-		"# Заголовок 2 #header_tag\t#header_tag",
-		"- [ ] Задача 2.1 #task1_tag\t#task1_tag #header_tag",
-		"- [X] Задача 2.2 #task2_tag\t#task2_tag #header_tag",
+		"N\tText\tTags",
+		"1\t# Заголовок 1\t",
+		"2\t- [ ] Задача 1.1 !(2018-03-18)\t",
+		"3\t- [X] Задача 1.2 !(2018-03-18 12:00)\t",
+		"4\t## Заголовок 1.1\t",
+		"5\t- [ ] Задача 1.1.1\t",
+		"6\t- [X] Задача 1.1.2\t",
+		"7\t# Заголовок 2 #header_tag\t#header_tag",
+		"8\t- [ ] Задача 2.1 #task1_tag\t#task1_tag #header_tag",
+		"9\t- [X] Задача 2.2 #task2_tag\t#task2_tag #header_tag",
 	}
 	assert.Equal(t, exp, ob.ShowAllTags().Build())
 }

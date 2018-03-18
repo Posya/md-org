@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+const indentString = "  "
+
 // OutBuilder is struct to build md-org output
 type OutBuilder struct {
 	_elements    []element
@@ -38,22 +40,29 @@ func (ob OutBuilder) Build() []string {
 	res := []string{}
 	indents := getIndents(ob._elements, ob._Indent)
 
+	if ob._showAllTags {
+		res = append(res, "N\tText\tTags")
+	} else {
+		res = append(res, "N\tText\t")
+	}
+
 	for _, el := range ob._elements {
+
 		line := ""
 		tags := ""
 		if ob._showAllTags && len(el.getTags()) > 0 {
-			tags = "\t" + strings.Join(el.getTags(), " ")
+			tags = strings.Join(el.getTags(), " ")
 		}
 
 		switch v := el.(type) {
 		case header:
-			line = fmt.Sprintf("%s%s %s%s", strings.Repeat("\t", indents[v.n]), strings.Repeat("#", v.level), v.text, tags)
+			line = fmt.Sprintf("%d\t%s %s\t%s", v.n, strings.Repeat(indentString, indents[v.n])+strings.Repeat("#", v.level), v.text, tags)
 		case task:
 			isDone := " "
 			if v.done {
 				isDone = "X"
 			}
-			line = fmt.Sprintf("%s- [%s] %s%s", strings.Repeat("\t", indents[v.n]), isDone, v.text, tags)
+			line = fmt.Sprintf("%d\t%s- [%s] %s\t%s", v.n, strings.Repeat(indentString, indents[v.n]), isDone, v.text, tags)
 		default:
 			panic("Something goes wrong: element has to be task or header only")
 		}

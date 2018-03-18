@@ -21,43 +21,43 @@ func TestBuild(t *testing.T) {
 
 	ob := NewOutBuilder(elem)
 	exp := []string{
-		"Заголовок 1",
-		"\t[ ] Задача 1.1",
-		"\t[X] Задача 1.2",
-		"\tЗаголовок 1.1",
-		"\t\t[ ] Задача 1.1.1",
-		"\t\t[X] Задача 1.1.2",
-		"Заголовок 2 #header_tag",
-		"\t[ ] Задача 2.1 #task1_tag",
-		"\t[X] Задача 2.2 #task2_tag",
+		"# Заголовок 1",
+		"\t- [ ] Задача 1.1",
+		"\t- [X] Задача 1.2",
+		"\t## Заголовок 1.1",
+		"\t\t- [ ] Задача 1.1.1",
+		"\t\t- [X] Задача 1.1.2",
+		"# Заголовок 2 #header_tag",
+		"\t- [ ] Задача 2.1 #task1_tag",
+		"\t- [X] Задача 2.2 #task2_tag",
 	}
 	assert.Equal(t, exp, ob.Indent().Build())
 
 	ob = NewOutBuilder(elem)
 	exp = []string{
-		"Заголовок 1",
-		"[ ] Задача 1.1",
-		"[X] Задача 1.2",
-		"Заголовок 1.1",
-		"[ ] Задача 1.1.1",
-		"[X] Задача 1.1.2",
-		"Заголовок 2 #header_tag",
-		"[ ] Задача 2.1 #task1_tag",
-		"[X] Задача 2.2 #task2_tag",
+		"# Заголовок 1",
+		"- [ ] Задача 1.1",
+		"- [X] Задача 1.2",
+		"## Заголовок 1.1",
+		"- [ ] Задача 1.1.1",
+		"- [X] Задача 1.1.2",
+		"# Заголовок 2 #header_tag",
+		"- [ ] Задача 2.1 #task1_tag",
+		"- [X] Задача 2.2 #task2_tag",
 	}
 	assert.Equal(t, exp, ob.Build())
 
 	ob = NewOutBuilder(elem)
 	exp = []string{
-		"Заголовок 1",
-		"[ ] Задача 1.1",
-		"[X] Задача 1.2",
-		"Заголовок 1.1",
-		"[ ] Задача 1.1.1",
-		"[X] Задача 1.1.2",
-		"Заголовок 2 #header_tag\t#header_tag",
-		"[ ] Задача 2.1 #task1_tag\t#task1_tag #header_tag",
-		"[X] Задача 2.2 #task2_tag\t#task2_tag #header_tag",
+		"# Заголовок 1",
+		"- [ ] Задача 1.1",
+		"- [X] Задача 1.2",
+		"## Заголовок 1.1",
+		"- [ ] Задача 1.1.1",
+		"- [X] Задача 1.1.2",
+		"# Заголовок 2 #header_tag\t#header_tag",
+		"- [ ] Задача 2.1 #task1_tag\t#task1_tag #header_tag",
+		"- [X] Задача 2.2 #task2_tag\t#task2_tag #header_tag",
 	}
 	assert.Equal(t, exp, ob.ShowAllTags().Build())
 }

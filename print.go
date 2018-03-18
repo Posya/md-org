@@ -47,13 +47,13 @@ func (ob OutBuilder) Build() []string {
 
 		switch v := el.(type) {
 		case header:
-			line = fmt.Sprintf("%s%s%s", strings.Repeat("\t", indents[v.n]), v.text, tags)
+			line = fmt.Sprintf("%s%s %s%s", strings.Repeat("\t", indents[v.n]), strings.Repeat("#", v.level), v.text, tags)
 		case task:
 			isDone := " "
 			if v.done {
 				isDone = "X"
 			}
-			line = fmt.Sprintf("%s[%s] %s%s", strings.Repeat("\t", indents[v.n]), isDone, v.text, tags)
+			line = fmt.Sprintf("%s- [%s] %s%s", strings.Repeat("\t", indents[v.n]), isDone, v.text, tags)
 		default:
 			panic("Something goes wrong: element has to be task or header only")
 		}

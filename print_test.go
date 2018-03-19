@@ -20,47 +20,47 @@ func TestBuild(t *testing.T) {
 	}
 
 	ob := NewOutBuilder(elem)
-	exp := []string{
-		"N\tText\t",
-		"1\t# Заголовок 1\t",
-		"2\t  - [ ] Задача 1.1 !(2018-03-18)\t",
-		"3\t  - [X] Задача 1.2 !(2018-03-18 12:00)\t",
-		"4\t  ## Заголовок 1.1\t",
-		"5\t    - [ ] Задача 1.1.1\t",
-		"6\t    - [X] Задача 1.1.2\t",
-		"7\t# Заголовок 2 #header_tag\t",
-		"8\t  - [ ] Задача 2.1 #task1_tag\t",
-		"9\t  - [X] Задача 2.2 #task2_tag\t",
+	exp := [][]string{
+		[]string{"N", "Text"},
+		[]string{"1", "# Заголовок 1"},
+		[]string{"2", "  - [ ] Задача 1.1 !(2018-03-18)"},
+		[]string{"3", "  - [X] Задача 1.2 !(2018-03-18 12:00)"},
+		[]string{"4", "  ## Заголовок 1.1"},
+		[]string{"5", "    - [ ] Задача 1.1.1"},
+		[]string{"6", "    - [X] Задача 1.1.2"},
+		[]string{"7", "# Заголовок 2 #header_tag"},
+		[]string{"8", "  - [ ] Задача 2.1 #task1_tag"},
+		[]string{"9", "  - [X] Задача 2.2 #task2_tag"},
 	}
 	assert.Equal(t, exp, ob.Indent().Build())
 
 	ob = NewOutBuilder(elem)
-	exp = []string{
-		"N\tText\t",
-		"1\t# Заголовок 1\t",
-		"2\t- [ ] Задача 1.1 !(2018-03-18)\t",
-		"3\t- [X] Задача 1.2 !(2018-03-18 12:00)\t",
-		"4\t## Заголовок 1.1\t",
-		"5\t- [ ] Задача 1.1.1\t",
-		"6\t- [X] Задача 1.1.2\t",
-		"7\t# Заголовок 2 #header_tag\t",
-		"8\t- [ ] Задача 2.1 #task1_tag\t",
-		"9\t- [X] Задача 2.2 #task2_tag\t",
+	exp = [][]string{
+		[]string{"N", "Text"},
+		[]string{"1", "# Заголовок 1"},
+		[]string{"2", "- [ ] Задача 1.1 !(2018-03-18)"},
+		[]string{"3", "- [X] Задача 1.2 !(2018-03-18 12:00)"},
+		[]string{"4", "## Заголовок 1.1"},
+		[]string{"5", "- [ ] Задача 1.1.1"},
+		[]string{"6", "- [X] Задача 1.1.2"},
+		[]string{"7", "# Заголовок 2 #header_tag"},
+		[]string{"8", "- [ ] Задача 2.1 #task1_tag"},
+		[]string{"9", "- [X] Задача 2.2 #task2_tag"},
 	}
 	assert.Equal(t, exp, ob.Build())
 
 	ob = NewOutBuilder(elem)
-	exp = []string{
-		"N\tText\tTags",
-		"1\t# Заголовок 1\t",
-		"2\t- [ ] Задача 1.1 !(2018-03-18)\t",
-		"3\t- [X] Задача 1.2 !(2018-03-18 12:00)\t",
-		"4\t## Заголовок 1.1\t",
-		"5\t- [ ] Задача 1.1.1\t",
-		"6\t- [X] Задача 1.1.2\t",
-		"7\t# Заголовок 2 #header_tag\t#header_tag",
-		"8\t- [ ] Задача 2.1 #task1_tag\t#task1_tag #header_tag",
-		"9\t- [X] Задача 2.2 #task2_tag\t#task2_tag #header_tag",
+	exp = [][]string{
+		[]string{"N", "Text", "Date", "Tags"},
+		[]string{"1", "# Заголовок 1", "", ""},
+		[]string{"2", "- [ ] Задача 1.1 !(2018-03-18)", "2018-03-18", ""},
+		[]string{"3", "- [X] Задача 1.2 !(2018-03-18 12:00)", "2018-03-18 12:00", ""},
+		[]string{"4", "## Заголовок 1.1", "", ""},
+		[]string{"5", "- [ ] Задача 1.1.1", "", ""},
+		[]string{"6", "- [X] Задача 1.1.2", "", ""},
+		[]string{"7", "# Заголовок 2 #header_tag", "", "#header_tag"},
+		[]string{"8", "- [ ] Задача 2.1 #task1_tag", "", "#task1_tag #header_tag"},
+		[]string{"9", "- [X] Задача 2.2 #task2_tag", "", "#task2_tag #header_tag"},
 	}
 	assert.Equal(t, exp, ob.ShowAllTags().Build())
 }

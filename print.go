@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -9,60 +9,90 @@ const indentString = "  "
 
 // OutBuilder is struct to build md-org output
 type OutBuilder struct {
-	_elements    []element
-	_showAllTags bool
-	_Indent      bool
+	_elements []element
+	_verbose  bool
+	_indent   bool
 }
 
 // NewOutBuilder returns new OutBuilder struct
 func NewOutBuilder(elements []element) OutBuilder {
 	res := OutBuilder{
-		_elements:    elements,
-		_showAllTags: false,
+		_elements: elements,
+		_verbose:  false,
 	}
 	return res
 }
 
 // ShowAllTags comand Build to add all tags (local and inherited)
 func (ob *OutBuilder) ShowAllTags() OutBuilder {
-	ob._showAllTags = true
+	ob._verbose = true
 	return *ob
 }
 
 // Indent swiches indents on
 func (ob *OutBuilder) Indent() OutBuilder {
-	ob._Indent = true
+	ob._indent = true
 	return *ob
 }
 
 // Build builds result slice
-func (ob OutBuilder) Build() []string {
-	res := []string{}
-	indents := getIndents(ob._elements, ob._Indent)
+func (ob OutBuilder) Build() [][]string {
+	res := [][]string{}
+	indents := map[int]int{}
 
-	if ob._showAllTags {
-		res = append(res, "N\tText\tTags")
+	if ob._indent {
+		indents = getIndents(ob._elements)
+	}
+
+	if ob._verbose {
+		res = append(res, []string{"N", "Text", "Date", "Tags"})
 	} else {
-		res = append(res, "N\tText\t")
+		res = append(res, []string{"N", "Text"})
 	}
 
 	for _, el := range ob._elements {
 
-		line := ""
+		line := []string{}
+
 		tags := ""
-		if ob._showAllTags && len(el.getTags()) > 0 {
+		if ob._verbose {
 			tags = strings.Join(el.getTags(), " ")
 		}
 
 		switch v := el.(type) {
 		case header:
-			line = fmt.Sprintf("%d\t%s %s\t%s", v.n, strings.Repeat(indentString, indents[v.n])+strings.Repeat("#", v.level), v.text, tags)
-		case task:
-			isDone := " "
-			if v.done {
-				isDone = "X"
+			line = append(line, strconv.Itoa(v.n))
+
+			indent := ""
+			if ob._indent {
+				indent = strings.Repeat(indentString, indents[v.n])
 			}
-			line = fmt.Sprintf("%d\t%s- [%s] %s\t%s", v.n, strings.Repeat(indentString, indents[v.n]), isDone, v.text, tags)
+
+			line = append(line, indent+strings.Repeat("#", v.level)+" "+v.text)
+
+			if ob._verbose {
+				line = append(line, "")
+				line = append(line, tags)
+			}
+		case task:
+			line = append(line, strconv.Itoa(v.n))
+
+			indent := ""
+			if ob._indent {
+				indent = strings.Repeat(indentString, indents[v.n])
+			}
+
+			isDone := "- [ ] "
+			if v.done {
+				isDone = "- [X] "
+			}
+
+			line = append(line, indent+isDone+v.text)
+
+			if ob._verbose {
+				line = append(line, v.date)
+				line = append(line, tags)
+			}
 		default:
 			panic("Something goes wrong: element has to be task or header only")
 		}

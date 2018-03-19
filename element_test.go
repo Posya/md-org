@@ -85,3 +85,39 @@ func TestFilterByTag(t *testing.T) {
 	assert.Equal(t, true, test["task with tags"].HasTag(""))
 	assert.Equal(t, true, test["task with tags"].HasTag("Tag1"))
 }
+
+func TestFilterTasks(t *testing.T) {
+	test := []element{
+		header{n: 1},
+		task{n: 2, done: false},
+		task{n: 3, done: true},
+		header{n: 4},
+		task{n: 5, done: true},
+		task{n: 6, done: true},
+	}
+
+	assert.Equal(t, 6, len(filterTasks(test, "all")))
+	assert.Equal(t, 4, len(filterTasks(test, "task")))
+	assert.Equal(t, 3, len(filterTasks(test, "done")))
+	assert.Equal(t, 1, len(filterTasks(test, "notdone")))
+}
+
+func TestSortTasks(t *testing.T) {
+	test := []element{
+		task{n: 2, done: false, date: "2018-03-18"},
+		task{n: 3, done: true, date: "2018-03-17"},
+		task{n: 5, done: true, date: "2018-03-16 12:00"},
+		task{n: 6, done: true, date: "2018-03-16"},
+	}
+
+	assert.Equal(t, test, sortTasks(test, "none"))
+
+	res := sortTasks(test, "done")
+	assert.Equal(t, 2, res[3].getN())
+
+	res = sortTasks(test, "date")
+	assert.Equal(t, 6, res[0].getN())
+	assert.Equal(t, 5, res[1].getN())
+	assert.Equal(t, 3, res[2].getN())
+	assert.Equal(t, 2, res[3].getN())
+}

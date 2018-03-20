@@ -84,6 +84,18 @@ func sortTasks(el []element, what string) []element {
 	return el
 }
 
+func filterBetveen(el []element, from, to string) []element {
+	res := []element{}
+	for _, e := range el {
+		if v, ok := e.(task); ok {
+			if v.Between(from, to) {
+				res = append(res, v)
+			}
+		}
+	}
+	return res
+}
+
 func getIndents(el []element) map[int]int {
 	res := map[int]int{}
 	for _, e := range el {

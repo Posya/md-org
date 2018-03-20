@@ -20,6 +20,10 @@ func (cl *cmdList) Execute(args []string) error {
 		return err
 	}
 
+	if cl.Filter == "all" && cl.SortBy != "none" {
+		cl.Filter = "task"
+	}
+
 	for _, file := range dir {
 		fmt.Println("File: ", file)
 		fmt.Println()
@@ -34,10 +38,6 @@ func (cl *cmdList) Execute(args []string) error {
 		elements, err := parse(lines)
 		if err != nil {
 			return err
-		}
-
-		if cl.Filter == "all" && cl.SortBy != "none" {
-			cl.Filter = "task"
 		}
 
 		switch cl.Filter {

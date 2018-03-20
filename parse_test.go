@@ -35,7 +35,7 @@ func TestParse(t *testing.T) {
 			"- [ ] First task 4",
 			"	- [ ] First task 4.1 !(2018.03.01) сделать.",
 			"asdfasdfasdf asdfasdfasdf",
-			"	- [ ] First task 4.2",
+			"	- [ ] First !(2018-03-20 14:45) task 4.2",
 		},
 	}
 
@@ -58,7 +58,7 @@ func TestParse(t *testing.T) {
 			task{17, 2, 15, false, "First task 3 #task_tag_1", []string{"#task_tag_1", "#tag1_1", "#tag1"}, ""},
 			task{18, 0, 15, false, "First task 4", []string{"#tag1_1", "#tag1"}, ""},
 			task{19, 1, 18, false, "First task 4.1 !(2018.03.01) сделать.", []string{"#tag1_1", "#tag1"}, "2018.03.01"},
-			task{21, 1, 18, false, "First task 4.2", []string{"#tag1_1", "#tag1"}, ""},
+			task{21, 1, 18, false, "First !(2018-03-20 14:45) task 4.2", []string{"#tag1_1", "#tag1"}, "2018.03.20 14:45"},
 		},
 	}
 
@@ -120,6 +120,11 @@ func TestParseTask(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, exp[i], v)
 	}
+}
+
+func TestParseTaskError(t *testing.T) {
+	_, err := parseTask("- [ ] Task !(2018-02-30)")
+	assert.Error(t, err)
 }
 
 func TestDateIsCorrect(t *testing.T) {

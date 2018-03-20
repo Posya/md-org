@@ -17,7 +17,7 @@ var (
 var location = time.Now().Location()
 
 func init() {
-	taskOrHeaderRegexp = regexp.MustCompile(`^\s*(#+|-\s+\[[ xX]\])`)
+	taskOrHeaderRegexp = regexp.MustCompile(`^\s*(#+\s+[\p{L}\d_]|-\s+\[[ xX]\]\s+[\p{L}\d_])`)
 	headerRegexp = regexp.MustCompile(`^\s*(#+)\s+([\p{L}\d_].*)$`)
 	taskRegexp = regexp.MustCompile(`^(\s*)-\s+\[([ xXхХvV])\]\s+([\p{L}\d_].*)$`)
 	// TODO: Check for # in the middle

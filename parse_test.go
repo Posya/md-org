@@ -97,6 +97,11 @@ func TestParseHeader(t *testing.T) {
 	}
 }
 
+func TestParseHeaderError(t *testing.T) {
+	_, err := parseHeader("#")
+	assert.Error(t, err)
+}
+
 func TestParseTask(t *testing.T) {
 	ins := []string{
 		"- [ ] Task 1",

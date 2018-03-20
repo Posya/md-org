@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,4 +64,57 @@ func TestBuild(t *testing.T) {
 		[]string{"9", "- [X] Задача 2.2 #task2_tag", "", "#task2_tag #header_tag"},
 	}
 	assert.Equal(t, exp, ob.ShowAllTags().Build())
+}
+
+func TestPrepareToPrint(t *testing.T) {
+	headerFuncs := []printFunc{
+		func(el element) (s string, skip bool) {
+			if v, ok := el.(header); ok {
+				return strconv.Itoa(v.n), false
+			}
+			panic("Wrong type: had to be header")
+		},
+		func(el element) (s string, skip bool) {
+			if v, ok := el.(header); ok {
+				return v.text, false
+			}
+			panic("Wrong type: had to be header")
+		},
+	}
+	taskFuncs := []printFunc{
+		func(el element) (s string, skip bool) {
+			if v, ok := el.(task); ok {
+				return strconv.Itoa(v.n), false
+			}
+			panic("Wrong type: had to be task")
+		},
+		func(el element) (s string, skip bool) {
+			if v, ok := el.(task); ok {
+				return v.text, false
+			}
+			panic("Wrong type: had to be task")
+		},
+		func(el element) (s string, skip bool) {
+			if v, ok := el.(task); ok {
+				return "X", v.done
+			}
+			panic("Wrong type: had to be task")
+		},
+	}
+
+	elem := []element{
+		header{n: 1, level: 1, parent: 0, text: "Заголовок 1", tags: []string{}},
+		task{n: 2, level: 3, parent: 1, done: false, text: "Задача 1.1 !(2018-03-18)", tags: []string{}, date: "2018-03-18"},
+		task{n: 3, level: 3, parent: 1, done: true, text: "Задача 1.2 !(2018-03-18 12:00)", tags: []string{}, date: "2018-03-18 12:00"},
+		header{n: 4, level: 2, parent: 1, text: "Заголовок 1.1", tags: []string{}},
+		task{n: 5, level: 6, parent: 4, done: false, text: "Задача 1.1.1", tags: []string{}, date: ""},
+		task{n: 6, level: 6, parent: 4, done: true, text: "Задача 1.1.2", tags: []string{}, date: ""},
+		header{n: 7, level: 1, parent: 0, text: "Заголовок 2 #header_tag", tags: []string{"#header_tag"}},
+		task{n: 8, level: 3, parent: 7, done: false, text: "Задача 2.1 #task1_tag", tags: []string{"#task1_tag", "#header_tag"}, date: ""},
+		task{n: 9, level: 3, parent: 7, done: true, text: "Задача 2.2 #task2_tag", tags: []string{"#task2_tag", "#header_tag"}, date: ""},
+	}
+
+	assert.Equal(t, []string{"1", "Заголовок 1"}, prepareToPrint(elem[0], headerFuncs, taskFuncs))
+	assert.Equal(t, []string{"2", "Задача 1.1 !(2018-03-18)", "X"}, prepareToPrint(elem[1], headerFuncs, taskFuncs))
+	assert.Equal(t, []string{"3", "Задача 1.2 !(2018-03-18 12:00)"}, prepareToPrint(elem[2], headerFuncs, taskFuncs))
 }

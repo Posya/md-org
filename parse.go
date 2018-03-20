@@ -22,7 +22,7 @@ func init() {
 	taskRegexp = regexp.MustCompile(`^(\s*)-\s+\[([ xXхХvV])\]\s+([\p{L}\d_].*)$`)
 	// TODO: Check for # in the middle
 	tagsRegexp = regexp.MustCompile(`#[\p{L}\d_]+`)
-	// TODO: Check for a dete in the middle
+	// TODO: Check for a date in the middle
 	dateRegexp = regexp.MustCompile(`!\((\d{4})[\/.-](\d{2})[\/.-](\d{2})(?: (\d{2})[.:](\d{2}))?\)`)
 }
 

@@ -8,7 +8,7 @@ import (
 type cmdArchive struct {
 	Verbose     bool   `short:"v" long:"verbose" description:"show more"`
 	ArchiveSign string `short:"s" long:"sign" default:"@" description:"sign to archive line. Has to be just one and first symbol of the line."`
-	ArchiveFile string `short:"a" long:"archive" default:"./archive.org.md" description:"file name to archive"`
+	ArchiveFile string `short:"a" long:"archive" default:"./archive.md" description:"file name to archive"`
 }
 
 func (ca *cmdArchive) Execute(args []string) error {

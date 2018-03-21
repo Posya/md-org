@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -19,6 +20,7 @@ func (ca *cmdAgenda) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	sort.Strings(dir)
 
 	if ca.To == "" {
 		t := time.Now().AddDate(0, 0, 1)

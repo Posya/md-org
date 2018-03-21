@@ -38,6 +38,21 @@ func WriteFile(lines []string, path string) error {
 	return w.Flush()
 }
 
+// AppendFile appends slice content to file
+func AppendFile(lines []string, path string) error {
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	w := bufio.NewWriter(file)
+	for _, line := range lines {
+		fmt.Fprintln(w, line)
+	}
+	return w.Flush()
+}
+
 // GetDirList returns list of current *.md-ord files as slice
 func GetDirList() ([]string, error) {
 	files, err := filepath.Glob("./*.org.md")

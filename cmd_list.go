@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"text/tabwriter"
 )
@@ -19,6 +20,7 @@ func (cl *cmdList) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
+	sort.Strings(dir)
 
 	if cl.Filter == "all" && cl.SortBy != "none" {
 		cl.Filter = "task"

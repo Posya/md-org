@@ -17,6 +17,7 @@ func main() {
 	parser.AddCommand("agenda", "shows agenda", "", &cmdAgenda{})
 	parser.AddCommand("add", "adds new task", "", &cmdAdd{})
 	parser.AddCommand("done", "mark task as done / not done", "", &cmdDone{})
+	parser.AddCommand("archive", "archive marked tasks", "", &cmdArchive{})
 
 	_, err := parser.Parse()
 	if err != nil {

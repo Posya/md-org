@@ -18,6 +18,7 @@ func main() {
 	parser.AddCommand("add", "adds new task", "", &cmdAdd{})
 	parser.AddCommand("done", "mark task as done / not done", "", &cmdDone{})
 	parser.AddCommand("archive", "archive marked tasks", "", &cmdArchive{})
+	parser.AddCommand("notify", "show notifications", "", &cmdNotify{})
 
 	_, err := parser.Parse()
 	if err != nil {

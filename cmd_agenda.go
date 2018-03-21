@@ -28,9 +28,6 @@ func (ca *cmdAgenda) Execute(args []string) error {
 	}
 
 	for _, file := range dir {
-		fmt.Println("File: ", file)
-		fmt.Println()
-
 		w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
 
 		lines, err := ReadFile(file)
@@ -48,6 +45,13 @@ func (ca *cmdAgenda) Execute(args []string) error {
 		elements = filterTasks(elements, "notdone")
 
 		elements = sortTasks(elements, "date")
+
+		if len(elements) == 0 {
+			continue
+		}
+
+		fmt.Println("File: ", file)
+		fmt.Println()
 
 		out := NewOutBuilder(elements)
 		if ca.Verbose {

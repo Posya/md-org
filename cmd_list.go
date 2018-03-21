@@ -27,11 +27,6 @@ func (cl *cmdList) Execute(args []string) error {
 	}
 
 	for _, file := range dir {
-		fmt.Println("File: ", file)
-		fmt.Println()
-
-		w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-
 		lines, err := ReadFile(file)
 		if err != nil {
 			return err
@@ -64,6 +59,13 @@ func (cl *cmdList) Execute(args []string) error {
 			panic("Something goes wrong. cl.SortBy = " + cl.SortBy)
 		}
 
+		if len(elements) == 0 {
+			continue
+		}
+
+		fmt.Println("File: ", file)
+		fmt.Println()
+
 		out := NewOutBuilder(elements)
 		if cl.Verbose {
 			out = out.ShowAllTags()
@@ -71,6 +73,9 @@ func (cl *cmdList) Execute(args []string) error {
 		if !cl.NoIndent {
 			out = out.Indent()
 		}
+
+		w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+
 		for _, l := range out.Build() {
 			fmt.Fprintln(w, strings.Join(l, "\t"))
 		}
